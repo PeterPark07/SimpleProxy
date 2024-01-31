@@ -1,4 +1,4 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, render_template
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -33,6 +33,10 @@ def add_root_to_all_links(html_content, root):
 
     return str(soup)
 
+def pretty_format_html(html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    return soup.prettify()
+
 @app.route('/<path:url>')
 def proxy(url):
     try:
@@ -50,6 +54,19 @@ def proxy(url):
         final_html = add_root_to_all_links(updated_html, root)
 
         return Response(final_html, content_type=content_type)
+    except Exception as e:
+        return str(e)
+
+@app.route('/source/<path:url>')
+def source(url):
+    try:
+        response = urlopen(url)
+        html_content = response.read()
+
+        # Pretty format the HTML source
+        pretty_html = pretty_format_html(html_content)
+
+        return render_template('source.html', source=pretty_html)
     except Exception as e:
         return str(e)
 
