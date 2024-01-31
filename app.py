@@ -4,6 +4,19 @@ from bs4 import BeautifulSoup  # Assuming you have BeautifulSoup installed
 
 app = Flask(__name__)
 
+def modify_links(base_url, html_content):
+    soup = BeautifulSoup(html_content, 'html.parser')
+    modified_urls = []
+
+    for a_tag in soup.find_all('a', href=True):
+        old_url = a_tag['href']
+        new_url = f'{base_url}/{old_url}'
+        a_tag['href'] = new_url
+        modified_urls.append((old_url, new_url))
+
+    updated_html = str(soup)
+    return updated_html, modified_urls
+
 @app.route('/<path:url>')
 def proxy(url):
     try:
@@ -11,15 +24,11 @@ def proxy(url):
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
-        # Parse the HTML content using BeautifulSoup
-        soup = BeautifulSoup(html_content, 'html.parser')
+        updated_html, modified_urls = modify_links(url, html_content)
 
-        # Update links in the HTML content to include the full external URL
-        for a_tag in soup.find_all('a', href=True):
-            a_tag['href'] = f'{url}/{a_tag["href"]}'
-
-        # Update the HTML content
-        updated_html = str(soup)
+        # Print out the modified URLs
+        for old_url, new_url in modified_urls:
+            print(f'Modified URL: {old_url} -> {new_url}')
 
         return Response(updated_html, content_type=content_type)
     except Exception as e:
