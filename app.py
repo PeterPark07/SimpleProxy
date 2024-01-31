@@ -28,8 +28,11 @@ def add_root_to_all_links(html_content, root):
 
     for a_tag in soup.find_all('a', href=True):
         old_url = a_tag['href']
+        print(old_url)
         new_url = f'{root}/{old_url}'
+        print(new_url)
         new_url = new_url.replace('//','/')
+        print(new_url)
         a_tag['href'] = new_url
 
     return str(soup)
