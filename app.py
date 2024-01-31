@@ -14,7 +14,7 @@ def modify_links(base_url, html_content):
         old_url = a_tag['href']
         
         # Check if the URL is relative and doesn't have http:// or https://
-        if not old_url.startswith(('http')) and '//' not in old_url:
+        if not old_url.startswith(('http')):
             if old_url.startswith(('/')):
                 new_url = f'{base_url}{old_url}'
             else:
@@ -63,10 +63,6 @@ def proxy(url):
         html_content = response.read()
 
         updated_html, modified_urls = modify_links(url, html_content)
-
-        # Print out the modified URLs
-        for old_url, new_url in modified_urls:
-            print(f'Modified URL: {old_url} -> {new_url}')
 
         # Add root part to all URLs
         final_html = add_root_to_all_links(updated_html, root)
