@@ -38,7 +38,7 @@ def pretty_format_html(html_content):
     return soup.prettify()
 
 @app.route('/source/<path:url>')
-def proxy(url):
+def source(url):
     try:
         response = urlopen(url)
         content_type = response.getheader('Content-Type')
