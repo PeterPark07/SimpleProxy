@@ -15,8 +15,10 @@ def modify_links(base_url, html_content):
         
         # Check if the URL is relative and doesn't have http:// or https://
         if not old_url.startswith(('http')):
-            new_url = f'{base_url}/{old_url}'
-            new_url = new_url.replace('//','/')
+            if old_url.startswith(('/')):
+                new_url = f'{base_url}{old_url}'
+            else:
+                new_url = f'{base_url}/{old_url}'
             a_tag['href'] = new_url
             modified_urls.append((old_url, new_url))
 
@@ -28,11 +30,7 @@ def add_root_to_all_links(html_content, root):
 
     for a_tag in soup.find_all('a', href=True):
         old_url = a_tag['href']
-        print(old_url)
-        new_url = f'{root}/{old_url}'
-        print(new_url)
-        new_url = new_url.replace('//','/')
-        print(new_url)
+        new_url = f'{root}{old_url}'
         a_tag['href'] = new_url
 
     return str(soup)
