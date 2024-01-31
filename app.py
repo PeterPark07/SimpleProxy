@@ -1,8 +1,10 @@
 from flask import Flask, request, Response
 from urllib.request import urlopen
-from bs4 import BeautifulSoup  # Assuming you have BeautifulSoup installed
+from bs4 import BeautifulSoup
+import os
 
 app = Flask(__name__)
+root = os.getenv('url')
 
 def modify_links(base_url, html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -24,7 +26,7 @@ def proxy(url):
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
-        updated_html, modified_urls = modify_links(url, html_content)
+        updated_html, modified_urls = modify_links(root+url, html_content)
 
         # Print out the modified URLs
         for old_url, new_url in modified_urls:
