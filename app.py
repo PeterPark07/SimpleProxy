@@ -1,7 +1,6 @@
 from flask import Flask, request, Response, render_template
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-from urllib.parse import urljoin
 import os
 
 app = Flask(__name__)
@@ -15,8 +14,9 @@ def modify_links(base_url, html_content):
         old_url = a_tag['href']
         
         # Check if the URL is relative and doesn't have http:// or https://
-        if not old_url.startswith(('http', 'https')):
-            new_url = urljoin(base_url, old_url)
+        if not old_url.startswith(('http')):
+            new_url = f'{base_url}/{old_url}'
+            new_url = new_url.replace('//','/')
             a_tag['href'] = new_url
             modified_urls.append((old_url, new_url))
 
@@ -28,7 +28,8 @@ def add_root_to_all_links(html_content, root):
 
     for a_tag in soup.find_all('a', href=True):
         old_url = a_tag['href']
-        new_url = urljoin(root, old_url)
+        new_url = f'{root}/{old_url}'
+        new_url = new_url.replace('//','/')
         a_tag['href'] = new_url
 
     return str(soup)
@@ -47,7 +48,7 @@ def source(url):
         # Pretty format the HTML source
         pretty_html = pretty_format_html(html_content)
 
-        return Response(pretty_html, content_type=content_type)
+        return Response(pretty_html, content_type='text/html')
     except Exception as e:
         return str(e)
 
