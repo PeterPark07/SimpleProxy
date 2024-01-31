@@ -48,7 +48,7 @@ def source(url):
 
         # Pretty format the HTML source
         pretty_html = pretty_format_html(html_content)
-        formatted_html = f'<pre>{pretty_html.decode("utf-8")}</pre>'
+        formatted_html = f'<pre>{pretty_html}</pre>'
 
         return Response(formatted_html, content_type='text/plain')
     except Exception as e:
