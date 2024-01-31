@@ -12,12 +12,25 @@ def modify_links(base_url, html_content):
 
     for a_tag in soup.find_all('a', href=True):
         old_url = a_tag['href']
-        new_url = f'{base_url}/{old_url}'
-        a_tag['href'] = new_url
-        modified_urls.append((old_url, new_url))
+        
+        # Check if the URL is relative and doesn't have http:// or https://
+        if not old_url.startswith(('http')):
+            new_url = f'{base_url}/{old_url}'
+            a_tag['href'] = new_url
+            modified_urls.append((old_url, new_url))
 
     updated_html = str(soup)
     return updated_html, modified_urls
+
+def add_root_to_all_links(html_content, root):
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    for a_tag in soup.find_all('a', href=True):
+        old_url = a_tag['href']
+        new_url = f'{root}/{old_url}'
+        a_tag['href'] = new_url
+
+    return str(soup)
 
 @app.route('/<path:url>')
 def proxy(url):
@@ -26,13 +39,16 @@ def proxy(url):
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
-        updated_html, modified_urls = modify_links(root+url, html_content)
+        updated_html, modified_urls = modify_links(url, html_content)
 
         # Print out the modified URLs
         for old_url, new_url in modified_urls:
             print(f'Modified URL: {old_url} -> {new_url}')
 
-        return Response(updated_html, content_type=content_type)
+        # Add root part to all URLs
+        final_html = add_root_to_all_links(updated_html, root)
+
+        return Response(final_html, content_type=content_type)
     except Exception as e:
         return str(e)
 
