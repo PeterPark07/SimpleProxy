@@ -37,6 +37,20 @@ def pretty_format_html(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
     return soup.prettify()
 
+@app.route('/source/<path:url>')
+def proxy(url):
+    try:
+        response = urlopen(url)
+        content_type = response.getheader('Content-Type')
+        html_content = response.read()
+
+        # Pretty format the HTML source
+        pretty_html = pretty_format_html(html_content)
+
+        return Response(pretty_html, content_type=content_type)
+    except Exception as e:
+        return str(e)
+
 @app.route('/<path:url>')
 def proxy(url):
     try:
@@ -57,19 +71,6 @@ def proxy(url):
     except Exception as e:
         return str(e)
 
-@app.route('/source/<path:url>')
-def proxy(url):
-    try:
-        response = urlopen(url)
-        content_type = response.getheader('Content-Type')
-        html_content = response.read()
-
-        # Pretty format the HTML source
-        pretty_html = pretty_format_html(html_content)
-
-        return Response(pretty_html, content_type=content_type)
-    except Exception as e:
-        return str(e)
 
 if __name__ == '__main__':
     app.run(debug=True)
