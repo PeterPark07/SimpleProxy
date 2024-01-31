@@ -57,7 +57,7 @@ def proxy(url):
     except Exception as e:
         return str(e)
 
-@app.route('/<path:url>')
+@app.route('/source/<path:url>')
 def proxy(url):
     try:
         response = urlopen(url)
