@@ -1,39 +1,8 @@
 from flask import Flask, request, Response, render_template
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
-import os
 
 app = Flask(__name__)
-root = os.getenv('url')
-
-def modify_links(base_url, html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    modified_urls = []
-
-    for a_tag in soup.find_all('a', href=True):
-        old_url = a_tag['href']
-        
-        # Check if the URL is relative and doesn't have http:// or https://
-        if not old_url.startswith(('http')):
-            if old_url.startswith(('/')):
-                new_url = f'{base_url}{old_url}'
-            else:
-                new_url = f'{base_url}/{old_url}'
-            a_tag['href'] = new_url
-            modified_urls.append((old_url, new_url))
-
-    updated_html = str(soup)
-    return updated_html, modified_urls
-
-def add_root_to_all_links(html_content, root):
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    for a_tag in soup.find_all('a', href=True):
-        old_url = a_tag['href']
-        new_url = f'{root}{old_url}'
-        a_tag['href'] = new_url
-
-    return str(soup)
 
 def pretty_format_html(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -62,12 +31,7 @@ def proxy(url):
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
-        updated_html, modified_urls = modify_links(url, html_content)
-
-        # Add root part to all URLs
-        final_html = add_root_to_all_links(updated_html, root)
-
-        return Response(final_html, content_type=content_type)
+        return Response(html_content, content_type=content_type)
     except Exception as e:
         return str(e)
 
