@@ -1,9 +1,13 @@
 from flask import Flask, request, Response, render_template
-from urllib.request import urlopen
+from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
 import os
 
 app = Flask(__name__)
+headers = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
+    'Accept-Language': 'en-US,en;q=0.9',
+}
 root = os.getenv('url')
 
 def modify_links(base_url, html_content):
@@ -42,7 +46,8 @@ def pretty_format_html(html_content):
 @app.route('/source/<path:url>')
 def source(url):
     try:
-        response = urlopen(url)
+        request = Request(url, headers=headers)
+        response = urlopen(request)
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
@@ -58,7 +63,8 @@ def source(url):
 @app.route('/<path:url>')
 def proxy(url):
     try:
-        response = urlopen(url)
+        request = Request(url, headers=headers)
+        response = urlopen(request)
         content_type = response.getheader('Content-Type')
         html_content = response.read()
 
