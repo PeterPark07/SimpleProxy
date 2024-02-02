@@ -8,18 +8,6 @@ headers = {
     'Accept-Language': 'en-US,en;q=0.9',
 }
 
-def modify_links(base_url, html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    for tag in soup.find_all(['a', 'img'], href=True):
-        old_url = tag['href']
-
-        if '//' not in old_url:
-            new_url = f'{base_url}/{old_url.lstrip("/")}'
-            tag['href'] = new_url
-
-    return str(soup)
-
-
 @app.route('/source/<path:url>')
 def source(url):
     try:
