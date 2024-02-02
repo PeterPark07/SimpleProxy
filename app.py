@@ -71,7 +71,7 @@ def proxy(url):
         updated_html, modified_urls = modify_links(url, html_content)
 
         # Add root part to all URLs
-        final_html = add_root_to_all_links(updated_html, root)
+        final_html = updated_html
 
         return Response(final_html, content_type=content_type)
     except Exception as e:
