@@ -8,25 +8,16 @@ headers = {
     'Accept-Language': 'en-US,en;q=0.9',
 }
 
-
 def modify_links(base_url, html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
-    modified_urls = []
+    for tag in soup.find_all(['a', 'img'], href=True):
+        old_url = tag['href']
 
-    for a_tag in soup.find_all('a', href=True):
-        old_url = a_tag['href']
-        
-        # Check if the URL is relative and doesn't have http:// or https://
-        if not old_url.startswith(('http')):
-            if old_url.startswith(('/')):
-                new_url = f'{base_url}{old_url}'
-            else:
-                new_url = f'{base_url}/{old_url}'
-            a_tag['href'] = new_url
-            modified_urls.append((old_url, new_url))
+        if '//' not in old_url:
+            new_url = f'{base_url}/{old_url.lstrip("/")}'
+            tag['href'] = new_url
 
-    updated_html = str(soup)
-    return updated_html, modified_urls
+    return str(soup)
 
 
 @app.route('/source/<path:url>')
