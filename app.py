@@ -28,27 +28,6 @@ def modify_links(base_url, html_content):
     updated_html = str(soup)
     return updated_html, modified_urls
 
-def pretty_format_html(html_content):
-    soup = BeautifulSoup(html_content, 'html.parser')
-    return soup.prettify()
-
-@app.route('/source/<path:url>')
-def source(url):
-    try:
-        request = Request(url, headers=headers)
-        response = urlopen(request)
-        content_type = response.getheader('Content-Type')
-        html_content = response.read()
-
-        # Pretty format the HTML source
-        pretty_html = pretty_format_html(html_content)
-        formatted_html = f'<pre>{pretty_html}</pre>'
-
-        return Response(formatted_html, content_type='text/plain')
-    except Exception as e:
-        return str(e)
-
-
 @app.route('/<path:url>')
 def proxy(url):
     try:
@@ -63,6 +42,26 @@ def proxy(url):
     except Exception as e:
         return str(e)
 
+
+
+
+
+
+@app.route('/source/<path:url>')
+def source(url):
+    try:
+        request = Request(url, headers=headers)
+        response = urlopen(request)
+        content_type = response.getheader('Content-Type')
+        html_content = response.read()
+
+        # Pretty format the HTML source
+        pretty_html = BeautifulSoup(html_content, 'html.parser').prettify()
+        formatted_html = f'<pre>{pretty_html}</pre>'
+
+        return Response(formatted_html, content_type='text/plain')
+    except Exception as e:
+        return str(e)
 
 if __name__ == '__main__':
     app.run(debug=True)
