@@ -1,14 +1,13 @@
 from flask import Flask, request, Response, render_template
 from urllib.request import urlopen, Request
 from bs4 import BeautifulSoup
-import os
 
 app = Flask(__name__)
 headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36',
     'Accept-Language': 'en-US,en;q=0.9',
 }
-root = os.getenv('url')
+
 
 def modify_links(base_url, html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -28,16 +27,6 @@ def modify_links(base_url, html_content):
 
     updated_html = str(soup)
     return updated_html, modified_urls
-
-def add_root_to_all_links(html_content, root):
-    soup = BeautifulSoup(html_content, 'html.parser')
-
-    for a_tag in soup.find_all('a', href=True):
-        old_url = a_tag['href']
-        new_url = f'{root}{old_url}'
-        a_tag['href'] = new_url
-
-    return str(soup)
 
 def pretty_format_html(html_content):
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -70,10 +59,7 @@ def proxy(url):
 
         updated_html, modified_urls = modify_links(url, html_content)
 
-        # Add root part to all URLs
-        final_html = updated_html
-
-        return Response(final_html, content_type=content_type)
+        return Response(updated_html, content_type=content_type)
     except Exception as e:
         return str(e)
 
