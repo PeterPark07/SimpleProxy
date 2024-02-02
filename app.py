@@ -28,24 +28,6 @@ def modify_links(base_url, html_content):
     updated_html = str(soup)
     return updated_html, modified_urls
 
-@app.route('/<path:url>')
-def proxy(url):
-    try:
-        request = Request(url, headers=headers)
-        response = urlopen(request)
-        content_type = response.getheader('Content-Type')
-        html_content = response.read()
-
-        updated_html, modified_urls = modify_links(url, html_content)
-
-        return Response(updated_html, content_type=content_type)
-    except Exception as e:
-        return str(e)
-
-
-
-
-
 
 @app.route('/source/<path:url>')
 def source(url):
